@@ -82,13 +82,24 @@ def AddEmp():
 
 @app.route("/getemp", methods=['GET', 'POST'])
 def GetEmp():
+    if request.method == 'POST':
+        empid = request.form['empid']
+        with conn.cursor() as cur:
+            cur.execute("SELECT * FROM Employee WHERE EmpID=%s", (empid,))
+            data = cur.fetchone()
+            if data is not None:
+                return render_template('GetEmp.html', data=data)
+            else:
+                return render_template('GetEmp.html', error="Employee not found")
+    else:
+        return render_template('GetEmp.html')
+
     cursor = db_conn.cursor()
     select_sql = "SELECT * FROM employee"
     cursor.execute(select_sql)
     rows = cursor.fetchall()
 
     return render_template('GetEmpOutput.html', rows=rows)
-
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=80, debug=True)
 
