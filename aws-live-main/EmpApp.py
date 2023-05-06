@@ -80,6 +80,17 @@ def AddEmp():
     print("all modification done...")
     return render_template('AddEmpOutput.html', name=emp_name)
 
+@app.route("/getemp", methods=['GET', 'POST'])
+def GetEmp():
+    cursor = db_conn.cursor()
+    select_sql = "SELECT * FROM employee"
+    cursor.execute(select_sql)
+    rows = cursor.fetchall()
+
+    return render_template('GetEmpOutput.html', rows=rows)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=80, debug=True)
+
+
+
