@@ -32,14 +32,14 @@ def about():
 
 @app.route("/Login", methods=['POST', 'GET'])
 def Login():
-    reg_id = (request.form|'reg_id' ]).lower ()
+    reg_id = (request.form['reg_id']).lower ()
     reg_pass = request. form['reg_pass']
 
     check_id = "SELECT COUNT (reg_id) FROM user WHERE reg_id=(%s)"
     check_pass = "SELECT COUNT(reg_pass) FROM user WHERE reg_pass-(%s) "
     correct_id = False
     correct_pass = False
-    cursor = db conn.cursor()
+    cursor = db_conn.cursor()
 
     if (cursor.execute(check_id, (reg_id)))>0:
         correct_id = True
@@ -49,12 +49,12 @@ def Login():
 
     if correct_id and correct_pass:
         print("Login successful")
-        return render template(''Attendance.html")
+        return render_template('Home.html')
     else:
-        print("Invalid user id or/and password*")
+        print("Invalid user id or/and password!")
         correct_id = False
         correct_pass = False
-        return, render_template('Login.html")
+        return render_template('Login.html')
 
 @app.route("/addemp", methods=['POST'])
 def AddEmp():
