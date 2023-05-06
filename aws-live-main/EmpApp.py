@@ -82,26 +82,34 @@ def AddEmp():
 
 @app.route("/getemp", methods=['GET', 'POST'])
 def GetEmp():
-    if request.method == 'POST':
-        empid = request.form['empid']
-        with conn.cursor() as cur:
-            cur.execute("SELECT * FROM Employee WHERE EmpID=%s", (empid,))
-            data = cur.fetchone()
-            if data is not None:
-                return render_template('GetEmp.html', data=data)
-            else:
-                return render_template('GetEmp.html', error="Employee not found")
+    emp_id = (request.form['emp_id']).lower()
+    check_sql = "SELECT emp_id FROM employee WHERE emp_id=(%s)"
+    cursor = db.conn.cursor()
+    cursor.execute(check_sql, (emp_id))
+    emp_id = re.sub('\W+','',str(cursor.fetchall()))
+    check_sql = "SELECT first_name FROM employee WHERE emp_id=(%s)"
+    cursor = db.conn.cursor()
+    cursor.execute(check_sql, (emp_id))
+    emp_first = re.sub('\W+','',str(cursor.fetchall()))
+    check_sql = "SELECT last_name FROM employee WHERE emp_id=(%s)"
+    cursor = db.conn.cursor()
+    cursor.execute(check_sql, (emp_id))
+    emp_last = re.sub('\W+','',str(cursor.fetchall()))
+    check_sql = "SELECT pri_skill FROM employee WHERE emp_id=(%s)"
+    cursor = db.conn.cursor()
+    cursor.execute(check_sql, (emp_id))
+    emp_interest = re.sub('\W+','',str(cursor.fetchall()))
+    check_sql = "SELECT location FROM employee WHERE emp_id=(%s)"
+    cursor = db.conn.cursor()
+    cursor.execute(check_sql, (emp_id))
+    emp_location = re.sub('\W+','',str(cursor.fetchall()))
+    emp_image_url = re.sub('W+','',str(cursor.fetchall()))
+    if str(emp_first) != "":
+        return render_template('GetEmpOutput.html', id=emp_id, fname=emp_first, lname=emp_last, interest=emp_interest, location=emp_location, image_url=emp_image_url)
     else:
-        return render_template('GetEmp.html')
+        print("Invalid ID")
+        return renderrender_template('GetEmp.html')
 
-    cursor = db_conn.cursor()
-    select_sql = "SELECT * FROM employee"
-    cursor.execute(select_sql)
-    rows = cursor.fetchall()
 
-    return render_template('GetEmpOutput.html', rows=rows)
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=80, debug=True)
-
-
-
