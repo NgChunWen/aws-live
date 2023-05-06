@@ -2,13 +2,56 @@
 <html>
 <head>
 	<title>Get Employee Information</title>
+	<style>
+		body {
+			background-color: beige;
+			font-family: avenir;
+			color: navy;
+			font-size: 14pt;
+		}
+		h1 {
+			text-align: center;
+		}
+		form {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			margin-top: 50px;
+		}
+		label {
+			margin-right: 10px;
+		}
+		input[type=text] {
+			height: 25px;
+			font-size: 14pt;
+			color: grey;
+		}
+		input[type=submit] {
+			background: grey;
+			height: 45px;
+			width: 200px;
+			color: white;
+			font-style: oblique;
+			margin-top: 10px;
+			border: none;
+		}
+		table {
+			margin-top: 50px;
+			border-collapse: collapse;
+		}
+		td {
+			padding: 5px;
+			border: 1px solid navy;
+		}
+	</style>
 </head>
 <body>
-	<h1>Get Employee Information</h1>
-	<form method="POST" action="{{ url_for('GetEmp') }}">
+	<h1>Employee Database</h1>
+	<form method="POST" action="{{ url_for('GetEmp') }}" autocomplete="on" enctype="multipart/form-data">
+		<button type="submit" formaction="/getemp">GET EMPLOYEE INFORMATION</button>
 		<label for="emp_id">Employee ID:</label>
-		<input type="text" id="emp_id" name="emp_id" required>
-		<input type="submit" value="Get Info">
+		<input type="text" id="emp_id" name="emp_id" required autofocus>
+		<button type="submit">Get Info</button>
 	</form>
 	{% if error %}
 		<p style="color:red;">Invalid Employee ID. Please try again.</p>
@@ -42,5 +85,10 @@
 			</tr>
 		</table>
 	{% endif %}
+	<center>
+		<font color="black" size="4" style="font-family: avenir">
+			<a href="/about">About Us</a>
+		</font>
+	</center>
 </body>
 </html>
