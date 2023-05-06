@@ -64,8 +64,8 @@ def registerEmp():
     reg_pass = request.form['reg_pass']
     reg_conf_pass = request.form['reg_conf_pass']
     
-    insert_sql = "INSERT INTO register VALUES (%s, %s)"
-    select_sql = "SELECT * FROM register WHERE reg_id=(%s)"
+    insert_sql = "INSERT INTO user VALUES (%s, %s)"
+    select_sql = "SELECT * FROM user WHERE reg_id=(%s)"
     cursor = db_conn.cursor()
     cursor.execute(select_sql, (reg_id))
     regid_no=cursor.fetchall()
