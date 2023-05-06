@@ -33,7 +33,7 @@ def about():
 
 @app.route("/Login", methods=['POST', 'GET'])
 def Login():
-    reg_id = (request.form['reg_id']).lower ()
+    reg_id = (request.form['reg_id']).lower()
     reg_pass = request. form['reg_pass']
 
     check_id = "SELECT COUNT (reg_id) FROM user WHERE reg_id=(%s)"
