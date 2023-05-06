@@ -1,0 +1,6 @@
+customhost = "employee.ctvl9ljmdxwu.us-east-1.rds.amazonaws.com"
+customuser = "aws_user"
+custompass = "12345678"
+customdb = "employee"
+custombucket = "ngchunwen-employee"
+customregion = "us-east-1"
