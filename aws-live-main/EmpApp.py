@@ -3,6 +3,7 @@ from pymysql import connections
 import os
 import boto3
 from config import *
+from werkzeug.exceptions import BadRequestKeyError
 
 app = Flask(__name__)
 
@@ -28,74 +29,79 @@ def home():
 
 @app.route("/about", methods=['POST'])
 def about():
-    return render_template('about.html')
+    return render_template('www.intellipaat.com')
 
 
 @app.route("/Login", methods=['POST', 'GET'])
 def Login():
-    reg_id = (request.form['reg_id']).lower()
-    reg_pass = request. form['reg_pass']
+    if request.method == 'POST':
+        reg_id = request.form['reg_id'].lower()
+        reg_pass = request.form['reg_pass']
+        cursor = db_conn.cursor()
 
-    check_id = "SELECT COUNT (reg_id) FROM user WHERE reg_id=(%s)"
-    check_pass = "SELECT COUNT(reg_pass) FROM user WHERE reg_pass=(%s) "
-    correct_id = False
-    correct_pass = False
-    cursor = db_conn.cursor()
+        # Check if the combination of reg_id and reg_pass exists in the database
+        check_login = "SELECT COUNT(*) FROM Login WHERE reg_id = %s AND reg_pass = %s"
+        cursor.execute(check_login, (reg_id, reg_pass))
+        result = cursor.fetchone()[0]
 
-    if (cursor.execute(check_id, (reg_id)))>0:
-        correct_id = True
-        
-    if (cursor.execute(check_pass, (reg_pass))) >0:
-        correct_pass = True
+        if result > 0:
+            print("Login successful")
+            return render_template('Home.html')
+        else:
+            print("Invalid user id or/and password!")
+            error = "Invalid user id or/and password!"
+            return render_template('Login.html', error=error)
+    
+    return render_template('Login.html')
 
-    if correct_id and correct_pass:
-        print("Login successful")
-        return render_template('Home.html')
-    else:
-        print("Invalid user id or/and password!")
-        correct_id = False
-        correct_pass = False
-        return render_template('Login.html')
 
 
 @app.route("/Register", methods=['GET', 'POST'])
 def registerEmp():
-    reg_id = (request.form['reg_id'])
-    reg_pass = request.form['reg_pass']
-    reg_conf_pass = request.form['reg_conf_pass']
-    
-    insert_sql = "INSERT INTO user VALUES (%s, %s)"
-    select_sql = "SELECT * FROM user WHERE reg_id=(%s)"
+    try:
+        reg_id = request.form['reg_id']
+        reg_pass = request.form['reg_pass']
+        reg_conf_pass = request.form['reg_conf_pass']
+    except BadRequestKeyError:
+        print("Bad Request")
+        return render_template('Register.html')
+
+    insert_sql = "INSERT INTO Login VALUES (%s, %s)"
+    select_sql = "SELECT * FROM Login WHERE reg_id=(%s)"
     cursor = db_conn.cursor()
-    cursor.execute(select_sql, (reg_id))
-    regid_no=cursor.fetchall()
-    
-    if reg_conf_pass!=reg_pass:
+    cursor.execute(select_sql, (reg_id,))
+    regid_no = cursor.fetchall()
+
+    if reg_conf_pass != reg_pass:
         print("Confirm password is wrong.")
         return render_template('Register.html')
-    elif str(regid_no) != "()":
-        print("This ID already existed. Please enter another one.")
+    elif len(regid_no) != 0:
+        print("This ID already exists. Please enter another one.")
         return render_template('Register.html')
     else:
         try:
             cursor.execute(insert_sql, (reg_id, reg_pass))
             db_conn.commit()
-            
         finally:
             cursor.close()
-            
+
         print("Successfully registered")
         return render_template("Login.html")
 
 
-@app.route("/addemp", methods=['POST'])
+@app.route("/AddEmp", methods=['POST'])
 def AddEmp():
-    emp_id = request.form['emp_id']
-    first_name = request.form['first_name']
-    last_name = request.form['last_name']
-    pri_skill = request.form['pri_skill']
-    location = request.form['location']
-    emp_image_file = request.files['emp_image_file']
+    if request.method == 'POST':
+        emp_id = request.form['emp_id']
+        first_name = request.form['first_name']
+        last_name = request.form['last_name']
+        pri_skill = request.form['pri_skill']
+        location = request.form['location']
+        emp_image_file = request.files['emp_image_file']
+        
+        # rest of the code
+    else:
+        return "Invalid request method"
 
     insert_sql = "INSERT INTO employee VALUES (%s, %s, %s, %s, %s)"
     cursor = db_conn.cursor()
@@ -137,45 +143,37 @@ def AddEmp():
     print("all modification done...")
     return render_template('AddEmpOutput.html', name=emp_name)
 
-@app.route("/getemp", methods=['GET', 'POST'])
+
+
+@app.route("/GetEmp", methods=['GET', 'POST'])
 def GetEmp():
     emp_id = (request.form['emp_id']).lower()
     check_sql = "SELECT emp_id FROM employee WHERE emp_id=(%s)"
-    cursor = db_conn.cursor()   
+    cursor = db_conn.cursor()
     cursor.execute(check_sql, (emp_id))
     emp_id = re.sub('\W+','',str(cursor.fetchall()))
     check_sql = "SELECT first_name FROM employee WHERE emp_id=(%s)"
-    cursor.close()
-    
     cursor = db_conn.cursor()
     cursor.execute(check_sql, (emp_id))
     emp_first = re.sub('\W+','',str(cursor.fetchall()))
     check_sql = "SELECT last_name FROM employee WHERE emp_id=(%s)"
-    cursor.close()
-
     cursor = db_conn.cursor()
     cursor.execute(check_sql, (emp_id))
     emp_last = re.sub('\W+','',str(cursor.fetchall()))
     check_sql = "SELECT pri_skill FROM employee WHERE emp_id=(%s)"
-    cursor.close()
-    
     cursor = db_conn.cursor()
     cursor.execute(check_sql, (emp_id))
     emp_interest = re.sub('\W+','',str(cursor.fetchall()))
     check_sql = "SELECT location FROM employee WHERE emp_id=(%s)"
-    cursor.close()
-    
     cursor = db_conn.cursor()
     cursor.execute(check_sql, (emp_id))
     emp_location = re.sub('\W+','',str(cursor.fetchall()))
-    cursor.close()
-    
     emp_image_url = re.sub('\W+','',str(cursor.fetchall()))
     if str(emp_first) != "":
         return render_template('GetEmpOutput.html', id=emp_id, fname=emp_first, lname=emp_last, interest=emp_interest, location=emp_location, image_url=emp_image_url)
     else:
         print("Invalid ID")
-        return render_template('GetEmp.html')
+        return renderrender_template('GetEmp.html')
 
 
 if __name__ == '__main__':
