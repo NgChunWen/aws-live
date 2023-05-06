@@ -32,6 +32,49 @@ def home():
 def about():
     return render_template('www.intellipaat.com')
 
+@app.route("/Register", methods=['GET', 'POST'])
+def registerEmp():
+    if request.method == 'POST':
+        reg_id = request.form.get('reg_id', '')
+        reg_pass = request.form.get('reg_pass', '')
+        reg_conf_pass = request.form.get('reg_conf_pass', '')
+
+        # Client-side validation
+        if not reg_id or not reg_pass or not reg_conf_pass:
+            error = "Please fill in all fields."
+            return render_template('Register.html', error=error)
+        elif reg_pass != reg_conf_pass:
+            error = "Passwords do not match."
+            return render_template('Register.html', error=error)
+
+        # Server-side validation
+        select_sql = "SELECT * FROM Login WHERE reg_id=(%s)"
+        cursor = db_conn.cursor()
+        cursor.execute(select_sql, (reg_id,))
+        regid_no = cursor.fetchall()
+
+        if len(regid_no) != 0:
+            error = "This ID already exists. Please enter another one."
+            return render_template('Register.html', error=error)
+        else:
+            insert_sql = "INSERT INTO Login VALUES (%s, %s)"
+            try:
+                cursor.execute(insert_sql, (reg_id, reg_pass))
+                db_conn.commit()
+            except Exception as e:
+                db_conn.rollback()
+                error = "An error occurred. Please try again later."
+                print("Error inserting data into database:", e)
+                return render_template('Register.html', error=error)
+            finally:
+                cursor.close()
+
+            print("Successfully registered")
+            return render_template("Login.html")
+
+    return render_template('Register.html', error=None)
+
+
 
 @app.route("/Login", methods=['POST', 'GET'])
 def Login():
@@ -55,42 +98,7 @@ def Login():
     
     return render_template('Login.html')
 
-
-
-@app.route("/Register", methods=['GET', 'POST'])
-def registerEmp():
-    try:
-        reg_id = request.form['reg_id']
-        reg_pass = request.form['reg_pass']
-        reg_conf_pass = request.form['reg_conf_pass']
-    except BadRequestKeyError:
-        print("Bad Request")
-        return render_template('Register.html')
-
-    insert_sql = "INSERT INTO Login VALUES (%s, %s)"
-    select_sql = "SELECT * FROM Login WHERE reg_id=(%s)"
-    cursor = db_conn.cursor()
-    cursor.execute(select_sql, (reg_id,))
-    regid_no = cursor.fetchall()
-
-    if reg_conf_pass != reg_pass:
-        print("Confirm password is wrong.")
-        return render_template('Register.html')
-    elif len(regid_no) != 0:
-        print("This ID already exists. Please enter another one.")
-        return render_template('Register.html')
-    else:
-        try:
-            cursor.execute(insert_sql, (reg_id, reg_pass))
-            db_conn.commit()
-        finally:
-            cursor.close()
-
-        print("Successfully registered")
-        return render_template("Login.html")
-
-
-@app.route("/AddEmp", methods=['POST'])
+@app.route("/addemp", methods=['GET', 'POST'])
 def AddEmp():
     if request.method == 'POST':
         emp_id = request.form['emp_id']
@@ -99,54 +107,52 @@ def AddEmp():
         pri_skill = request.form['pri_skill']
         location = request.form['location']
         emp_image_file = request.files['emp_image_file']
-        
-        # rest of the code
-    else:
-        return "Invalid request method"
 
-    insert_sql = "INSERT INTO employee VALUES (%s, %s, %s, %s, %s)"
-    cursor = db_conn.cursor()
+        insert_sql = "INSERT INTO employee VALUES (%s, %s, %s, %s, %s)"
+        cursor = db_conn.cursor()
 
-    if emp_image_file.filename == "":
-        return "Please select a file"
-
-    try:
-
-        cursor.execute(insert_sql, (emp_id, first_name, last_name, pri_skill, location))
-        db_conn.commit()
-        emp_name = "" + first_name + " " + last_name
-        # Uplaod image file in S3 #
-        emp_image_file_name_in_s3 = "emp-id-" + str(emp_id) + "_image_file"
-        s3 = boto3.resource('s3')
+        if emp_image_file.filename == "":
+            return "Please select a file"
 
         try:
-            print("Data inserted in MySQL RDS... uploading image to S3...")
-            s3.Bucket(custombucket).put_object(Key=emp_image_file_name_in_s3, Body=emp_image_file)
-            bucket_location = boto3.client('s3').get_bucket_location(Bucket=custombucket)
-            s3_location = (bucket_location['LocationConstraint'])
+            cursor.execute(insert_sql, (emp_id, first_name, last_name, pri_skill, location))
+            db_conn.commit()
+            emp_name = "" + first_name + " " + last_name
+            
+            # Upload image file in S3
+            emp_image_file_name_in_s3 = "emp-id-" + str(emp_id) + "_image_file"
+            s3 = boto3.resource('s3')
 
-            if s3_location is None:
-                s3_location = ''
-            else:
-                s3_location = '-' + s3_location
+            try:
+                print("Data inserted in MySQL RDS... uploading image to S3...")
+                s3.Bucket(custombucket).put_object(Key=emp_image_file_name_in_s3, Body=emp_image_file)
+                bucket_location = boto3.client('s3').get_bucket_location(Bucket=custombucket)
+                s3_location = (bucket_location['LocationConstraint'])
 
-            object_url = "https://s3{0}.amazonaws.com/{1}/{2}".format(
-                s3_location,
-                custombucket,
-                emp_image_file_name_in_s3)
+                if s3_location is None:
+                    s3_location = ''
+                else:
+                    s3_location = '-' + s3_location
 
-        except Exception as e:
-            return str(e)
+                object_url = "https://s3{0}.amazonaws.com/{1}/{2}".format(
+                    s3_location,
+                    custombucket,
+                    emp_image_file_name_in_s3)
 
-    finally:
-        cursor.close()
+            except Exception as e:
+                return str(e)
 
-    print("all modification done...")
-    return render_template('AddEmpOutput.html', name=emp_name)
+        finally:
+            cursor.close()
+
+        print("All modifications done...")
+        return render_template('AddEmpOutput.html', name=emp_name)
+    else:
+        return render_template('AddEmp.html')
 
 
 
-@app.route("/GetEmp", methods=['GET', 'POST'])
+@app.route("/getemp", methods=['GET', 'POST'])
 def GetEmp():
     if 'emp_id' in request.form:
         emp_id = (request.form['emp_id']).lower()
@@ -179,10 +185,6 @@ def GetEmp():
     else:
         print("emp_id key not found in request.form")
         return render_template('GetEmp.html')
-
-
-
-
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=80, debug=True)
