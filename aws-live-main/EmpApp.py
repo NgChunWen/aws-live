@@ -37,7 +37,7 @@ def Login():
     reg_pass = request. form['reg_pass']
 
     check_id = "SELECT COUNT (reg_id) FROM user WHERE reg_id=(%s)"
-    check_pass = "SELECT COUNT(reg_pass) FROM user WHERE reg_pass-(%s) "
+    check_pass = "SELECT COUNT(reg_pass) FROM user WHERE reg_pass=(%s) "
     correct_id = False
     correct_pass = False
     cursor = db_conn.cursor()
