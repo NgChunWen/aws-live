@@ -79,7 +79,7 @@ def registerEmp():
     else:
         try:
             cursor.execute(insert_sql, (reg_id, reg_pass))
-            db.conn.commit()
+            db_conn.commit()
             
         finally:
             cursor.close()
