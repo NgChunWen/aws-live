@@ -1,59 +1,41 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Get Employee Information</title>
-	<style>
-		body {
-			font-size: 18px;
-		}
-	</style>
+	<title>Employee Information</title>
 </head>
-<body>
-	<center>
-		<font color="black" size="4" style="font-family: avenir">
+<center>
+	<font color="black" size="5" style="font-family: avenir">
 
-			<h1>Get Employee Information</h1>
+		<h1 style="color: DodgerBlue">Employee Information</h1>
 
-			<form method="POST" action="{{ url_for('GetEmp') }}">
-				<label for="emp_id">Employee ID:</label>
-				<input type="text" id="emp_id" name="emp_id" required>
-				<input type="submit" value="Get Info">
+		<body bgcolor="lightgrey">
+
+			<form>
+
+				<div>
+
+			  		Employee ID:<br> {{ id }} <br><br>
+
+			  		First Name:<br> {{ fname }} <br><br>
+
+			  		Last Name:<br> {{ lname }} <br><br>
+
+			  		Primary Interest:<br> {{ interest }} <br><br>
+
+			  		Location:<br> {{ location }} <br><br>
+
+			  		Image URL: <br> {{ image_url }} <br><br>
+
+					<form action="/Home" autocomplete="on" method="POST" enctype="multipart/form-data">
+
+						<button type="submit" formaction="/Home" style="background: grey; height: 45px; width: 200px; color:white; font:oblique;">BACK TO HOME PAGE</button><br><br>
+
+			  	</div>
+
 			</form>
 
-			{% if error %}
-				<p style="color:red;">Invalid Employee ID. Please try again.</p>
-			{% endif %}
+		</body>
 
-			{% if fname %}
-				<h2>Employee Information:</h2>
-				<table>
-					<tr>
-						<td>ID:</td>
-						<td>{{ id }}</td>
-					</tr>
-					<tr>
-						<td>First Name:</td>
-						<td>{{ fname }}</td>
-					</tr>
-					<tr>
-						<td>Last Name:</td>
-						<td>{{ lname }}</td>
-					</tr>
-					<tr>
-						<td>Primary Skill:</td>
-						<td>{{ interest }}</td>
-					</tr>
-					<tr>
-						<td>Location:</td>
-						<td>{{ location }}</td>
-					</tr>
-					<tr>
-						<td>Image URL:</td>
-						<td>{{ image_url }}</td>
-					</tr>
-				</table>
-			{% endif %}
-		</font>
-	</center>
-</body>
+	</font>
+</center>
 </html>
