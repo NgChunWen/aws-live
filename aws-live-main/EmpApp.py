@@ -30,6 +30,7 @@ def home():
 def about():
     return render_template('www.intellipaat.com')
 
+
 @app.route("/Login", methods=['POST', 'GET'])
 def Login():
     reg_id = (request.form['reg_id']).lower ()
@@ -55,6 +56,37 @@ def Login():
         correct_id = False
         correct_pass = False
         return render_template('Login.html')
+
+
+@app.route("/Register", methods=['GET', 'POST'])
+def registerEmp():
+    reg_id = (request.form['reg_id'])
+    reg_pass = request.form['reg_pass']
+    reg_conf_pass = request.form['reg_conf_pass']
+    
+    insert_sql = "INSERT INTO register VALUES (%s, %s)"
+    select_sql = "SELECT * FROM register WHERE reg_id=(%s)"
+    cursor = db_conn.cursor()
+    cursor.execute(select_sql, (reg_id))
+    regid_no=cursor.fetchall()
+    
+    if reg_conf_pass!=reg_pass:
+        print("Confirm password is wrong.")
+        return render_template('Register.html')
+    elif str(regid_no) != "()":
+        print("This ID already existed. Please enter another one.")
+        return render_template('Register.html')
+    else:
+        try:
+            cursor.execute(insert_sql, (reg_id, reg_pass))
+            db.conn.commit()
+            
+        finally:
+            cursor.close()
+            
+        print("Successfully registered")
+        return render_template("Login.html")
+
 
 @app.route("/addemp", methods=['POST'])
 def AddEmp():
@@ -128,7 +160,7 @@ def GetEmp():
     cursor = db.conn.cursor()
     cursor.execute(check_sql, (emp_id))
     emp_location = re.sub('\W+','',str(cursor.fetchall()))
-    emp_image_url = re.sub('W+','',str(cursor.fetchall()))
+    emp_image_url = re.sub('\W+','',str(cursor.fetchall()))
     if str(emp_first) != "":
         return render_template('GetEmpOutput.html', id=emp_id, fname=emp_first, lname=emp_last, interest=emp_interest, location=emp_location, image_url=emp_image_url)
     else:
