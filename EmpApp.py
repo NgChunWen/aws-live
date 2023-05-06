@@ -168,12 +168,16 @@ def GetEmp():
     cursor = db_conn.cursor()
     cursor.execute(check_sql, (emp_id))
     emp_location = re.sub('\W+','',str(cursor.fetchall()))
+    check_sql = "SELECT emp_image_url FROM employee WHERE emp_id=(%s)"
+    cursor = db_conn.cursor()
+    cursor.execute(check_sql, (emp_id))
     emp_image_url = re.sub('\W+','',str(cursor.fetchall()))
     if str(emp_first) != "":
         return render_template('GetEmpOutput.html', id=emp_id, fname=emp_first, lname=emp_last, interest=emp_interest, location=emp_location, image_url=emp_image_url)
     else:
         print("Invalid ID")
         return render_template('GetEmp.html')
+
 
 
 
