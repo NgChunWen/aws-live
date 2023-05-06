@@ -2,33 +2,55 @@
 <html>
 <head>
 	<title>Home</title>
+	<style>
+		h1 {
+			font-size: 48px;
+		}
+		
+		.form-button {
+			background-color: grey;
+			color: white;
+			font-size: 20px;
+			font-weight: bold;
+			padding: 15px 35px;
+			border-radius: 10px;
+			border: none;
+			cursor: pointer;
+			transition: background-color 0.3s ease;
+			margin-right: 10px;
+			margin-bottom: 10px;
+		}
+		
+		.form-button:hover {
+			background-color: #333;
+		}
+	</style>
 </head>
-<center>
-	<font color="black" size="4" style="font-family: avenir">
-
+<body bgcolor="beige">
+	<center>
 		<h1 style="color: navy">Home Page</h1>
-
-		<body bgcolor="beige">
-
-			<form action="/AddEmp" autocomplete="on" method = "POST" enctype="multipart/form-data">
-
-				<button type="submit" formaction="/AddEmp" style="background: grey; height: 45px; width: 200px; color:white; font:oblique;">Add Employee</button><br><br>
-
-			<form action="/GetEmp" autocomplete="on" method = "POST" enctype="multipart/form-data">
-
-		  		<button type="submit" formaction="/GetEmp" style="background: grey; height: 45px; width: 200px; color:white; font:oblique;">Get Employee Details</button><br><br>
-				
-			<form action="/Attendance" autocomplete="on" method = "POST" enctype="multipart/form-data">
-
-		  		<button type="submit" formaction="/Attendance" style="background: grey; height: 45px; width: 200px; color:white; font:oblique;">Attendance</button><br><br>
-				
-			<form action="/Login.html" autocomplete="on" method = "POST" enctype="multipart/form-data">
-
-		  		<button type="submit" formaction="/Login.html" style="background: grey; height: 30px; width: 150px; color:white; font:oblique;">Back</button><br><br>
-
-			</form>
-		</body>
-
-	</font>
-</center>
+		<div class = "form-container form-container-2">
+		<div class="home-button">
+			<a href="/addemp">
+				<button class="form-button">Add Employee</button>
+			</a>
+		</div>
+		<div class="home-button">
+			<a href="/getemp">
+				<button class="form-button">Get Employee Details</button>
+			</a>
+		</div>
+		<div class="home-button">
+			<a href="/Attendance">
+				<button class="form-button">Attendance</button>
+			</a>
+		</div>
+		<div class="home-button">
+			<a href="/Login">
+				<button class="form-button">Back</button>
+			</a>
+		</div>
+	</center>
+</body>
 </html>
+
