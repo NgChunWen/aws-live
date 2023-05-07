@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Check Out</title>
+<head>
+<center>
+	<font color="black" size="4" style="font-family: avenir">
+	<script>
+		function dateAndTime() {
+			var currentDate = new Date();
+			var dateTimeString = currentDate.toLocaleString();
+			return dateTimeString;
+		}
+		
+		function checkOut() {
+			var checkOutDT = dateAndTime();
+			var checkOutElement = document.getElementById("checkout-datetime");
+			checkOutElement.value = checkOutDT;
+		}
+		
+		window.onload = function() {
+			var urlParams = new URLSearchParams(window.location.search);
+			var checkInDT = urlParams.get('checkInTime');
+			var checkInElement = document.getElementById("checkin-datetime");
+			checkInElement.value = checkInDT;
+			checkOut();
+		};
+	</script>
+	</head>
+		<h1 style="color: navy">Employee's Attendance</h1>
+
+		<body bgcolor="beige" onload="dateAndTime()">
+			
+			<input type="text" id="checkin-datetime" name="check_in" readonly>
+			<input type="text" id="checkout-datetime" name="check_out" readonly>
+			<br><br>
+			<button onclick="checkOut()" type="button">Check Out</button>
+			<br><br>
+			
+		<div class = "form-container form-container-2">
+			<a href="/Attendance">
+				<button>Back</button>
+			</a>
+		</div>	
+	</body>
+	</font>
+</center>
+</html>

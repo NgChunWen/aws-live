@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Check In</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        function dateAndTime() {
+            var currentDate = new Date();
+            var dateTimeString = currentDate.toLocaleString();
+            return dateTimeString;
+        }
+        
+        function checkIn() {
+            var checkInDT = dateAndTime();
+            localStorage.setItem("checkInTime", checkInDT);
+            var checkInElement = document.getElementById("checkin-datetime");
+            checkInElement.value = checkInDT;
+           
+        $.ajax({
+            type: "POST",
+            url: "/checkin",
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(response) {
+                alert("Check-in time stored successfully!");
+        }
+        error: function() {
+            alert("Failed to store check-in time.");
+        }
+            });
+        }
+    </script>
+</head>
+<body>
+    <h1>Employee's Attendance</h1>
+
+    <input type="text" id="checkin-datetime" name="check_in" readonly>
+
+    <br><br>
+
+    <button onclick="checkIn()">Check In</button>
+
+    <script>
+        dateAndTime();
+    </script>
+</body>
+</html>
