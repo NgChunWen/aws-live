@@ -215,31 +215,6 @@ def Attendance():
                 
     else:
         return render_template('Attendance.html')
-    
-@app.route("/Attendance", methods=['POST', 'GET'])
-def Attendance():
-    if request.method == 'POST':
-        if 'emp_id' in request.form:
-            emp_id = request.form['emp_id'].lower()        
-            check_sql = "SELECT emp_id FROM employee WHERE emp_id = %s"
-            cursor = db_conn.cursor()
-            cursor.execute(check_sql, (emp_id,))
-            employee = cursor.fetchone()
-            
-            
-            if employee is None:
-                error = "Employee ID does not exist."
-                return render_template('Attendance.html', error=error)
-            else:
-                emp_id_verified = True
-                insert_sql = "INSERT INTO Attendance (emp_id) VALUES (%s)"
-                cursor.execute(insert_sql, (emp_id,))
-                db_conn.commit()
-                return render_template('Attendance.html', emp_id=emp_id, emp_id_verified=emp_id_verified)
-                
-                
-    else:
-        return render_template('Attendance.html')
 
 @app.route("/CheckIn", methods=['POST', 'GET'])
 def CheckIn():
